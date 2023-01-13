@@ -9,8 +9,8 @@ import { getUrlInfo } from './utils'
 import { IConfig } from './interface'
 import { SkipCompress } from './compress/skip'
 
-const ALLOW_EXTNAME = ['.png', '.jpg', '.webp', '.jpeg']
-const WEBP_EXTNAME = ['.png', '.webp']
+const ALLOW_EXTNAME = ['.png', '.jpg', '.webp', '.jpeg', '.gif']
+const WEBP_EXTNAME = ['.png', '.webp', '.gif']
 
 function handle(ctx: PicGo) {
   const config: IConfig = ctx.getConfig('transformer.compress') || ctx.getConfig('picgo-plugin-compress')
@@ -23,10 +23,10 @@ function handle(ctx: PicGo) {
     ctx.log.info('图片地址:' + imageUrl)
     const info = getUrlInfo(imageUrl)
     ctx.log.info('图片信息:' + JSON.stringify(info))
+    if (info.extname.toLowerCase() == '.gif')
+      return Image2WebPCompress(ctx, { imageUrl })
     if (ALLOW_EXTNAME.includes(info.extname.toLowerCase())) {
       switch (compress) {
-        case CompressType.tinypng:
-          return key ? TinypngKeyCompress(ctx, { imageUrl, key }) : TinypngCompress(ctx, { imageUrl })
         case CompressType.image2webp:
           if (WEBP_EXTNAME.includes(info.extname.toLowerCase()))
             return Image2WebPCompress(ctx, { imageUrl })
