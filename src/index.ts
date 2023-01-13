@@ -10,6 +10,7 @@ import { IConfig } from './interface'
 import { SkipCompress } from './compress/skip'
 
 const ALLOW_EXTNAME = ['.png', '.jpg', '.webp', '.jpeg']
+const WEBP_EXTNAME = ['.png', '.webp']
 
 function handle(ctx: PicGo) {
   const config: IConfig = ctx.getConfig('transformer.compress') || ctx.getConfig('picgo-plugin-compress')
@@ -26,10 +27,11 @@ function handle(ctx: PicGo) {
       switch (compress) {
         case CompressType.tinypng:
           return key ? TinypngKeyCompress(ctx, { imageUrl, key }) : TinypngCompress(ctx, { imageUrl })
+        case CompressType.image2webp:
+          if (WEBP_EXTNAME.includes(info.extname.toLowerCase()))
+            return Image2WebPCompress(ctx, { imageUrl })
         case CompressType.imagemin:
           return ImageminCompress(ctx, { imageUrl })
-        case CompressType.image2webp:
-          return Image2WebPCompress(ctx, { imageUrl })
         default:
           return key ? TinypngKeyCompress(ctx, { imageUrl, key }) : TinypngCompress(ctx, { imageUrl })
       }
